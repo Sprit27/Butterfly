@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polar Equation Animation</title>
+    <style>
+        body {
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let theta = 0; // Moved initialization before calling resizeCanvas
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawPolarEquation(theta);
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        resizeCanvas();
+
+        function drawPolarEquation(progress) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(70, -70);
+            ctx.lineWidth = 0.02;
+            ctx.strokeStyle = `hsl(${progress * 360}, 100%, 50%)`;
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = `hsl(${progress * 360}, 100%, 50%)`;
+            ctx.beginPath();
+
+            for (let t = 0; t <= progress * Math.PI * 2; t += 0.01) {
+                let r = Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5);
+                let x = r * Math.sin(t); // Swap x and y to make it vertical
+                let y = r * Math.cos(t);
+                ctx.lineTo(x, y);
+            }
+
+            ctx.stroke();
+            ctx.resetTransform();
+        }
+
+        function animate() {
+            theta += 0.002;
+            if (theta > 1) {
+                theta = 1;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPolarEquation(theta);
+            if (theta < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                setInterval(() => {
+                    theta += 1;
+                    if (theta > 360) theta = 0;
+                    drawPolarEquation(Math.random());
+                    if (theta > 360) theta = 0;
+                    drawPolarEquation(1);
+                }, 100);
+            }
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
